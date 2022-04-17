@@ -37,8 +37,10 @@ def upload_file():
             stream = os.popen('ipfs add -r ./cache/' + filename + '/' + filename[:-4])
             #stream = os.popen('echo ' + filename)
             output = stream.read()
+            arrayOutput = output.split(" ")
+            toReturn = arrayOutput[-2]
             #return a response that is a json object with the hash of the file
-            return output
+            return toReturn
             
             return redirect(url_for('upload_file',
                                     filename=filename))
