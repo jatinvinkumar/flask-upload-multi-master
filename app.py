@@ -15,7 +15,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/file', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
         # check if the post request has the file part
@@ -37,12 +37,13 @@ def upload_file():
             stream = os.popen('ipfs add -r ./cache/' + filename + '/' + filename[:-4])
             #stream = os.popen('echo ' + filename)
             output = stream.read()
-            output
+            #return a response that is a json object with the hash of the file
             return output
+            
             return redirect(url_for('upload_file',
                                     filename=filename))
     return render_template('index.html')
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0',debug=True,port=5000)
