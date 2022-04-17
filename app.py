@@ -5,11 +5,14 @@ import os
 import zipfile
 from flask import Flask, request, redirect, url_for, flash, render_template
 from werkzeug.utils import secure_filename
+from flask_cors import CORS
 
 UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__))
 ALLOWED_EXTENSIONS = set(['zip'])
 
 app = Flask(__name__)
+
+CORS(app, resources={r"*": {"origins": "*"}})
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -40,7 +43,7 @@ def upload_file():
             arrayOutput = output.split(" ")
             toReturn = arrayOutput[-2]
             #return a response that is a json object with the hash of the file
-            return toReturn
+            return "ipfs hash: " + output
             
             return redirect(url_for('upload_file',
                                     filename=filename))
