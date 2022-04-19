@@ -41,7 +41,7 @@ def upload_file():
             zip_ref = zipfile.ZipFile(os.path.join(UPLOAD_FOLDER, filename), 'r')
             zip_ref.extractall('./cache/' + filename)
             zip_ref.close()
-            stream = os.popen('sudo ipfs add -r ./cache/' + filename + '/' + filename[:-4])
+            stream = os.popen('ipfs add -r ./cache/' + filename + '/' + filename[:-4])
             #stream = os.popen('echo ' + filename)
             output = stream.read()
             arrayOutput = output.split(" ")
