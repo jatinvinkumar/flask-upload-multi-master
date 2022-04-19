@@ -44,7 +44,7 @@ def upload_file():
             toReturn = arrayOutput[-2]
             #return a response that is a json object with the hash of the file
             return jsonify(
-                cid=arrayOutput[-2]
+                cid= "" + output + ""
             )
             
             return redirect(url_for('upload_file',
