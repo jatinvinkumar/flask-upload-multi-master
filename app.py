@@ -34,20 +34,30 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(UPLOAD_FOLDER, filename))
+        toReturn = "nothing"
+        try:
+            print("hey print")
+            os.popen('echo "hi echo" ')
             zip_ref = zipfile.ZipFile(os.path.join(UPLOAD_FOLDER, filename), 'r')
             zip_ref.extractall('./cache/' + filename)
             zip_ref.close()
-            stream = os.popen('ipfs add -r ./cache/' + filename + '/' + filename[:-4])
+            stream = os.popen('sudo ipfs add -r ./cache/' + filename + '/' + filename[:-4])
             #stream = os.popen('echo ' + filename)
             output = stream.read()
             arrayOutput = output.split(" ")
-            toReturn = arrayOutput[-2]
+            toReturn = output
+            #toReturn = arrayOutput[-2]
             #return a response that is a json object with the hash of the file
-            return jsonify(
-                cid=arrayOutput[-2]
+        except:
+            print("shit")
+            os.popen('echo "shit man" ')
+        finally:
+            print("well")
+        return jsonify(
+                cid= "" + toReturn + ""
             )
-            
-            return redirect(url_for('upload_file',
+        return "o my"
+        return redirect(url_for('upload_file',
                                     filename=filename))
     return render_template('index.html')
 
