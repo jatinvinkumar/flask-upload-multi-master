@@ -20,7 +20,7 @@ element = driver.find_element_by_tag_name("canvas")
 location = element.location
 size = element.size
 
-driver.save_screenshot("imageCache/shot.png")
+driver.save_screenshot("imageCache/shot3.png")
 
 
 
