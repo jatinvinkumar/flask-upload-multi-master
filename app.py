@@ -93,12 +93,13 @@ def getScreenShot():
 
     driver.save_screenshot(os.path.join(UPLOAD_FOLDER, "/imageCache/screenshot_" + cid + ".png"))
 
-    stream = os.popen("ipfs add -r ./imageCache/screenshot_" + cid + ".png")
+    stream = os.popen("ipfs add -r ./screenshot_" + cid + ".png")
     output = stream.read()
+    print(output)
     arrayOutput = output.split(" ")
     toReturn = output
     return jsonify(
-                cid= "" + element.tag_name + ""
+                cid= "" + toReturn  + ""
             )
 
 
