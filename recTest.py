@@ -23,3 +23,4 @@ driver.save_screenshot("imageCache/shot.png")
 #im = Image.open('shot.png')
 #im = im.crop((int(x), int(y), int(width), int(height)))
 #im.save('image.png')
+

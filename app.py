@@ -80,10 +80,14 @@ def getScreenShot():
     options.add_argument("start-maximized")
     options.add_argument("disable-infobars")
     options.add_argument("--disable-extensions")
+    options.add_argument("--headless");
+    options.add_argument("--disable-gpu");
+    options.add_argument("--disable-dev-shm-usage");
     driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
     driver.get('http://35.232.44.3:8080/ipfs/' + cid + '/')
 
     element = driver.find_element_by_tag_name("canvas")
+
     location = element.location
     size = element.size
 
@@ -94,7 +98,7 @@ def getScreenShot():
     arrayOutput = output.split(" ")
     toReturn = output
     return jsonify(
-                cid= "" + toReturn + ""
+                cid= "" + element.tag_name + ""
             )
 
 
@@ -102,3 +106,5 @@ def getScreenShot():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',debug=True,port=5000)
+
+
