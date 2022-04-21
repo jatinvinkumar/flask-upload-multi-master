@@ -83,8 +83,6 @@ def getScreenShot():
     options.add_argument("--headless");
     options.add_argument("--disable-gpu");
     options.add_argument("--disable-dev-shm-usage");
-    options.add_argument("window-size=1980,960");
-    options.add_argument("screenshot");
     driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
     driver.get('http://35.232.44.3:8080/ipfs/' + cid + '/')
 
