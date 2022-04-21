@@ -91,7 +91,7 @@ def getScreenShot():
     location = element.location
     size = element.size
 
-    driver.save_screenshot(os.path.join(UPLOAD_FOLDER, "screenshot_" + cid + ".png"))
+    driver.save_screenshot(os.path.join(UPLOAD_FOLDER, "/imageCache/screenshot_" + cid + ".png"))
 
     stream = os.popen("ipfs add -r ./imageCache/screenshot_" + cid + ".png")
     output = stream.read()
