@@ -6,6 +6,9 @@ import zipfile
 from flask import Flask, jsonify, request, redirect, url_for, flash, render_template
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
+from selenium import webdriver
+from PIL import Image
+from webdriver_manager.chrome import ChromeDriverManager
 
 UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__))
 ALLOWED_EXTENSIONS = set(['zip'])
@@ -60,6 +63,33 @@ def upload_file():
         return redirect(url_for('upload_file',
                                     filename=filename))
     return render_template('index.html')
+
+@app.route('/getScreenShot', methods=['GET', 'POST'])
+def getScreenShot():
+    cid = request.form['cid']
+    # if user does not select file, browser also
+    # submit a empty part without filename
+    if cid == '':
+        flash('No CID passed')
+        return redirect(request.url)
+    driver = webdriver.Chrome(ChromeDriverManager().install())
+    driver.get('http://35.232.44.3:8080/ipfs/' + cid + '/')
+
+    element = driver.find_element_by_tag_name("canvas")
+    location = element.location
+    size = element.size
+
+    driver.save_screenshot("imageCache/screenshot_" + cid + ".png")
+
+    stream = os.popen("ipfs add -r ./imageCache/screenshot_" + cid + ".png")
+    output = stream.read()
+    arrayOutput = output.split(" ")
+    toReturn = output
+    return jsonify(
+                cid= "" + toReturn + ""
+            )
+
+
 
 
 if __name__ == "__main__":
