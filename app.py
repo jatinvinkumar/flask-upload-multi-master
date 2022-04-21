@@ -95,6 +95,7 @@ def getScreenShot():
 
     stream = os.popen("ipfs add -r ./screenshot_" + cid + ".png")
     output = stream.read()
+    print("hello")
     print(output)
     arrayOutput = output.split(" ")
     toReturn = output
