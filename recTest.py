@@ -11,6 +11,8 @@ size = element.size
 
 driver.save_screenshot("imageCache/shot.png")
 
+
+
 # x = location['x']
 # y = location['y']
 # w = size['width']
