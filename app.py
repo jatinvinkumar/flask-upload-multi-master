@@ -68,6 +68,7 @@ def upload_file():
 @app.route('/getScreenShot', methods=['GET', 'POST'])
 def getScreenShot():
     cid = request.form['cid']
+    seed = request.form['seed']
     # if user does not select file, browser also
     # submit a empty part without filename
     if cid == '':
@@ -84,18 +85,21 @@ def getScreenShot():
     options.add_argument("--disable-gpu");
     options.add_argument("--disable-dev-shm-usage");
     driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
-    driver.get('http://35.232.44.3:8080/ipfs/' + cid + '/')
+    driver.get('http://35.232.44.3:8080/ipfs/' + cid + '/?seed=' + seed)
 
     element = driver.find_element_by_tag_name("canvas")
 
     location = element.location
     size = element.size
-
-    driver.save_screenshot(os.path.join(UPLOAD_FOLDER, "/imageCache/screenshot_" + cid + ".png"))
-
-    stream = os.popen("ipfs add -r ./screenshot_" + cid + ".png")
+    print("sup nerd")
+    os.popen('echo "hi echo" ')
+    driver.save_screenshot(os.path.join(UPLOAD_FOLDER, "screenshot_" + cid + ".png"))
+    os.sleep(1)
+    #stream = os.popen("ipfs add ./screenshot_" + cid + ".png")
+    #stream = os.popen("ipfs add screenshot_QmQ5nusUzBAeS3YGBnYroimd2jcQRYXvDZMj9c72D83Hxn.png")
+    stream = os.popen('echo "bruh"')
     output = stream.read()
-    print("hello")
+    print("hello there")
     print(output)
     arrayOutput = output.split(" ")
     toReturn = output
