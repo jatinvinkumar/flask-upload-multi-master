@@ -3,6 +3,7 @@
 
 import os
 import zipfile
+import time
 from flask import Flask, jsonify, request, redirect, url_for, flash, render_template
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
@@ -93,10 +94,10 @@ def getScreenShot():
     print("sup nerd")
     os.popen('echo "hi echo" ')
     driver.save_screenshot(os.path.join(UPLOAD_FOLDER, "screenshot_" + cid + ".png"))
-
-    #stream = os.popen("ipfs add ./screenshot_" + cid + ".png")
+    time.sleep(2)
+    stream = os.popen("ipfs add " + os.path.join(UPLOAD_FOLDER, "screenshot_" + cid + ".png"))
     #stream = os.popen("ipfs add screenshot_QmQ5nusUzBAeS3YGBnYroimd2jcQRYXvDZMj9c72D83Hxn.png")
-    stream = os.popen(echo "bruh")
+    #stream = os.popen('echo "bruh"')
     output = stream.read()
     print("hello there")
     print(output)
