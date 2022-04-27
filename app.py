@@ -113,8 +113,9 @@ def getScreenShot():
 @app.route('/getMetaData', methods=['GET', 'POST'])
 def getMetaData():
     #https://rinkeby.infura.io/v3/ce27477f441742249fa8614a3b3872de
-    tokenAddress = request.form["tokenAddress"]
-    cid = request.form["cid"]
+    tokenAddress = request.args.get("tokenAddress")
+    cid = request.args.get("cid")
+    seed = request.args.get("seed")
     infura_url = 'https://rinkeby.infura.io/v3/ce27477f441742249fa8614a3b3872de'
     web3 = Web3(Web3.HTTPProvider(infura_url))
 
@@ -127,9 +128,8 @@ def getMetaData():
     contractInfo = contract.functions.getInfo().call()
 
     #convert supply to Wei witch is 18 decimal places)
-    print('contract info: ', contractInfo[0])
+    print('contract info: ', contractInfo)
 
-    seed = request.form['seed']
     # if user does not select file, browser also
     # submit a empty part without filename
     if cid == '':
@@ -146,11 +146,35 @@ def getMetaData():
     options.add_argument("--disable-gpu");
     options.add_argument("--disable-dev-shm-usage");
     driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
-    driver.get('http://35.232.44.3:8080/ipfs/' + cid + '/?seed=' + seed)
+    driver.get('http://35.232.44.3:8080/ipfs/' + cid)
 
     features = driver.execute_script("return window.$features")
 
     print("features data", features)
+
+    element = driver.find_element_by_tag_name("canvas")
+
+    location = element.location
+    size = element.size
+    print("sup nerd")
+    os.popen('echo "hi echo" ')
+    driver.save_screenshot(os.path.join(UPLOAD_FOLDER, "screenshot_" + cid + ".png"))
+    time.sleep(2)
+    stream = os.popen("ipfs add " + os.path.join(UPLOAD_FOLDER, "screenshot_" + cid + ".png"))
+    #stream = os.popen("ipfs add screenshot_QmQ5nusUzBAeS3YGBnYroimd2jcQRYXvDZMj9c72D83Hxn.png")
+    #stream = os.popen('echo "bruh"')
+    output = stream.read()
+    print("hello there")
+    print(output)
+    arrayOutput = []
+    imageCID = ""
+    try:
+        arrayOutput = output.split(" ")
+        imageCID = arrayOutput[-2]
+    except:
+        imageCID = ""
+
+    imageURL = 'http://35.232.44.3:8080/ipfs/' + imageCID
 
     # struct GenerativeTokenInfo {
     #     address tokenAddress;
@@ -163,16 +187,23 @@ def getMetaData():
     #     uint curSupply;
     # }
 
+    # return jsonify(
+    #             tokenAddress = contractInfo[0],
+    #             imgUri = contractInfo[1],
+    #             baseSiteURI = contractInfo[2],
+    #             name = contractInfo[3],
+    #             description = contractInfo[4],
+    #             price = contractInfo[5],
+    #             maxSupply = contractInfo[6],
+    #             curSupply = contractInfo[7],
+    #             attributes = features 
+    #         )
+
     return jsonify(
-                tokenAddress = contractInfo[0],
-                imgUri = contractInfo[1],
-                baseSiteURI = contractInfo[2],
+                image = imageURL,
                 name = contractInfo[3],
                 description = contractInfo[4],
-                price = contractInfo[5],
-                maxSupply = contractInfo[6],
-                curSupply = contractInfo[7],
-                featureAttributes = features 
+                attributes = features
             )
     
     return "cool"
