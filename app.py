@@ -114,7 +114,7 @@ def getScreenShot():
 def getMetaData():
     #https://rinkeby.infura.io/v3/ce27477f441742249fa8614a3b3872de
     tokenAddress = request.args.get("tokenAddress")
-    cid = request.args.get("cid")
+    #cid = request.args.get("cid")
     seed = request.args.get("seed")
     infura_url = 'https://rinkeby.infura.io/v3/ce27477f441742249fa8614a3b3872de'
     web3 = Web3(Web3.HTTPProvider(infura_url))
@@ -130,11 +130,15 @@ def getMetaData():
     #convert supply to Wei witch is 18 decimal places)
     print('contract info: ', contractInfo)
 
+    cid = contractInfo[2].split("/ipfs/")[-1]
+
+    print("features bitch: " , cid)
+
     # if user does not select file, browser also
     # submit a empty part without filename
-    if cid == '':
-        flash('No CID passed')
-        return redirect(request.url)
+    # if cid == '':
+    #     flash('No CID passed')
+    #     return redirect(request.url)
     #driver = webdriver.Chrome(ChromeDriverManager().install())
     options = Options()
     options.add_argument("--headless")
