@@ -6,7 +6,7 @@ import zipfile
 import time
 from flask import Flask, jsonify, request, redirect, url_for, flash, render_template
 from werkzeug.utils import secure_filename
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from selenium import webdriver
 from PIL import Image
 from webdriver_manager.chrome import ChromeDriverManager
@@ -19,14 +19,22 @@ ALLOWED_EXTENSIONS = set(['zip'])
 
 app = Flask(__name__)
 
-cors = CORS(app)
+# cors = CORS(app)
+app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy   dog'
+app.config['CORS_HEADERS'] = 'Content-Type'
+
+cors = CORS(app, resources={r"/foo": {"origins": "http://localhost:port"}})
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/file', methods=['GET', 'POST'])
+@cross_origin(origin='localhost',headers=['Content- Type','Authorization'])
 def upload_file():
+    # return jsonify(
+    #             cid= "sup kid"
+    #         )
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -52,6 +60,12 @@ def upload_file():
         output = stream.read()
         arrayOutput = output.split(" ")
         toReturn = output
+        websiteCID = ""
+        try:
+            arrayOutput = output.split(" ")
+            websiteCID = arrayOutput[-2]
+        except:
+            websiteCID = ""
         #toReturn = arrayOutput[-2]
         #return a response that is a json object with the hash of the file
         # except:
@@ -61,7 +75,7 @@ def upload_file():
         #     print("well")
         
         return jsonify(
-                cid= "" + toReturn + ""
+                cid= "" + websiteCID + ""
             )
         return "o my"
         return redirect(url_for('upload_file',
@@ -208,7 +222,8 @@ def getMetaData():
                 image = imageURL,
                 name = contractInfo[3],
                 description = contractInfo[4],
-                attributes = features
+                attributes = features, 
+                external_url = contractInfo[2] + "/?seed=" + seed
             )
     
     return "cool"
