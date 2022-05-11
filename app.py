@@ -228,6 +228,21 @@ def getMetaData():
     
     return "cool"
 
+
+@app.route('/getMetaDataTest', methods=['GET', 'POST'])
+def getMetaDataTest():
+    #https://rinkeby.infura.io/v3/ce27477f441742249fa8614a3b3872de
+
+    return jsonify(
+                image = "https://picsum.photos/200",
+                name = "testington wellsorth",
+                description = "testington's scrotum was bitten off by a rabid dog when he was a child. When he grew up, he would go around at night and take the testicles of sleeping dogs. Eventually, he came to be known as the infomous: BOWBOW Testicleton.",
+                attributes = "one testicle", 
+                external_url = "https://testington.wiki"
+            )
+    
+    return "cool"
+
 # Make new endpoint for metadata
 
     
