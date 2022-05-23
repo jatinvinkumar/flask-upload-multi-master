@@ -245,6 +245,55 @@ def getMetaDataTest():
 
 # Make new endpoint for metadata
 
+@app.route('/getScreenShotJS', methods=['GET', 'POST'])
+def getScreenShot():
+    cid = request.form['cid']
+    seed = request.form['seed']
+    # if user does not select file, browser also
+    # submit a empty part without filename
+    if cid == '':
+        flash('No CID passed')
+        return redirect(request.url)
+    #driver = webdriver.Chrome(ChromeDriverManager().install())
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("start-maximized")
+    options.add_argument("disable-infobars")
+    options.add_argument("--disable-extensions")
+    options.add_argument("--headless");
+    options.add_argument("--disable-gpu");
+    options.add_argument("--disable-dev-shm-usage");
+    driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
+    driver.get('http://35.232.44.3:8080/ipfs/' + cid + '/?seed=' + seed)
+
+    element = driver.find_element_by_tag_name("canvas")
+
+    injected_javascript = (
+        'var dataURL = canvas.toDataURL("png");'
+        'return dataURL;'
+    )
+
+    location = element.location
+    size = element.size
+    print("sup nerd")
+    os.popen('echo "hi echo" ')
+    #driver.save_screenshot(os.path.join(UPLOAD_FOLDER, "screenshot_" + cid + ".png"))
+    screenshot = driver.execute_async_script(injected_javascript)
+    time.sleep(2)
+    stream = os.popen("ipfs add " + os.path.join(UPLOAD_FOLDER, screenshot))
+    #stream = os.popen("ipfs add screenshot_QmQ5nusUzBAeS3YGBnYroimd2jcQRYXvDZMj9c72D83Hxn.png")
+    #stream = os.popen('echo "bruh"')
+    output = stream.read()
+    print("hello there")
+    print(output)
+    arrayOutput = output.split(" ")
+    toReturn = output
+    return jsonify(
+                screenshotData = screenshot
+            )
+
+
     
 
 if __name__ == "__main__":
