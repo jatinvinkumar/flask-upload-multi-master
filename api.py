@@ -4,7 +4,7 @@
 import os
 import zipfile
 import time
-from flask import Flask, jsonify, request, redirect, url_for, flash, render_template, send_file,  make_response
+from flask import Flask, jsonify, request, redirect, url_for, flash, render_template
 from werkzeug.utils import secure_filename
 from flask_cors import CORS, cross_origin
 from selenium import webdriver
@@ -13,8 +13,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 import json
 from web3 import Web3
-import urllib.parse
-import random
+import json
 
 UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__))
 ALLOWED_EXTENSIONS = set(['zip'])
@@ -31,7 +30,6 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
 #define and initiate the JSON const object 
 # Opening JSON file
 f = open('constants.json')
@@ -39,7 +37,11 @@ f = open('constants.json')
 # returns JSON object as 
 # a dictionary
 CONST = json.load(f)
-CONST = CONST['const'][0]
+  
+# Iterating through the json
+# list
+for i in CONST['const']:
+    print(i)
   
 # Closing file
 f.close()
@@ -309,12 +311,41 @@ def JSgetScreenShot():
                 screenshotData = screenshot
             )
 
-#helper functions
+#notion endpoints
 
-def scrapeImageLegacy(url):
-    #driver = webdriver.Chrome(ChromeDriverManager().install())
+# @app.route('/getAllGenerators', methods=['GET', 'POST'])
+# def getAllGenerators():
+
+# @app.route('/getRandomGenerator', methods=['GET', 'POST'])
+# def getRandomGenerator():
+
+#suburl
+# @app.route('/getGeneratorInfo/{contractAddress}', methods=['GET', 'POST'])
+# def getGeneratorInfo():
+
+# @app.route('/getIterations/{contractAddress}', methods=['GET', 'POST'])
+# def getIterations():
+
+# @app.route('/getTokenInfo/{contractAddress}/{tokenID}', methods=['GET', 'POST'])
+# def getTokenInfo():
+
+@app.route('/getTokenImage/{contractAddress}/{tokenID}', methods=['GET', 'POST'])
+def getTokenImage():
+    url = "http://35.193.145.29:8080/ipfs/QmR1dDnSXz98vYXf4eL7kiR5qUEWCjJ3F96ts1Y7cfaqFH/?seed=Qmd286K6pohQcTKYqnS1YhWrCiS4gz7Xi34sdwMe9USZ7u"
+    
+
+# @app.route('/getTokenMetadata/{contractAddress}/{tokenID}', methods=['GET', 'POST'])
+# def getTokenMetadata():
+
+#helper functions for
+
+#screen shotting module
+#input parameters: cid, seed
+def scrapeImage(url):
+
+    #set webdriver options
     options = Options()
-    options.add_argument("--headless")
+    #options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("start-maximized")
     options.add_argument("disable-infobars")
@@ -322,18 +353,30 @@ def scrapeImageLegacy(url):
     options.add_argument("--headless");
     options.add_argument("--disable-gpu");
     options.add_argument("--disable-dev-shm-usage");
+    #install driver
     driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
+
+    #ip = CONST["const"].get("SERVER_IP")
+    #port = CONST["const"]["PORT_NUMBER"]
     driver.get(url)
 
+
     element = driver.find_element_by_tag_name("canvas")
+    injected_javascript = (
+        'var dataURL = canvas.toDataURL("png");'
+        'return "dataURL";'
+    )
 
     location = element.location
     size = element.size
+    print("")
     print("sup nerd")
     os.popen('echo "hi echo" ')
-    driver.save_screenshot(os.path.join(UPLOAD_FOLDER, "screenshot_" + "cid" + ".png"))
+    #driver.save_screenshot(os.path.join(UPLOAD_FOLDER, "screenshot_" + cid + ".png"))
+    screenshot = driver.execute_async_script(injected_javascript)
     time.sleep(2)
-    stream = os.popen("ipfs add " + os.path.join(UPLOAD_FOLDER, "screenshot_" + "cid"+ ".png"))
+    return screenshot
+    stream = os.popen("ipfs add " + os.path.join(UPLOAD_FOLDER, screenshot))
     #stream = os.popen("ipfs add screenshot_QmQ5nusUzBAeS3YGBnYroimd2jcQRYXvDZMj9c72D83Hxn.png")
     #stream = os.popen('echo "bruh"')
     output = stream.read()
@@ -341,219 +384,9 @@ def scrapeImageLegacy(url):
     print(output)
     arrayOutput = output.split(" ")
     toReturn = output
-    return "" + toReturn  + ""
-
-def scrapeImage(url):
-    #driver = webdriver.Chrome(ChromeDriverManager().install())
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("start-maximized")
-    options.add_argument("disable-infobars")
-    options.add_argument("--disable-extensions")
-    options.add_argument("--headless");
-    options.add_argument("--disable-gpu");
-    options.add_argument("--disable-dev-shm-usage");
-    driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
-    driver.get(url)
-
-    element = driver.find_element_by_tag_name("canvas")
-
-    location = element.location
-    size = element.size
-    print("sup nerd")
-    os.popen('echo "hi echo" ')
-    #generate random string
-    
-    driver.save_screenshot(os.path.join(UPLOAD_FOLDER, "screenshot_" + "123" + ".png"))
-    time.sleep(2)
-    stream = os.popen("ipfs add " + os.path.join(UPLOAD_FOLDER, "screenshot_" + "123"+ ".png"))
-    #stream = os.popen("ipfs add screenshot_QmQ5nusUzBAeS3YGBnYroimd2jcQRYXvDZMj9c72D83Hxn.png")
-    #stream = os.popen('echo "bruh"')
-    output = stream.read()
-    print("hello there")
-    print(output)
-    arrayOutput = output.split(" ")[1]
-    toReturn = output
-    return send_file(os.path.join(UPLOAD_FOLDER, "screenshot_" + "123" + ".png"))
-
-def scrapeMetaData(canvasURI, generatorInfoOnChain):
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("start-maximized")
-    options.add_argument("disable-infobars")
-    options.add_argument("--disable-extensions")
-    options.add_argument("--headless");
-    options.add_argument("--disable-gpu");
-    options.add_argument("--disable-dev-shm-usage");
-    driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=options)
-    driver.get(canvasURI)
-
-    features = driver.execute_script("return window.$features")
-
-    print("features data", features)
-
-    element = driver.find_element_by_tag_name("canvas")
-
-    #contract address + tokenID
-    canvasURIEscaped = urllib.parse.quote(canvasURI)
-    canvasURIEscaped = canvasURIEscaped.replace("/", "%2F")
-    #streamimageURL = CONST["ROOT_PATH"] + "getTokenImage/" + canvasURIEscaped
-    seed = canvasURI.split("?seed=")[1]
-    imageURL = CONST["ROOT_PATH"] + "getTokenImage/" + generatorInfoOnChain[0] + "/" + seed
-    
-    return {
-        "image" : imageURL,
-        "external_url" : canvasURI,
-        "description" : generatorInfoOnChain[2],
-        "name" : generatorInfoOnChain[1],
-        "attributes" : features, 
-    }
-    
-            
-
-#notion endpoints le fin
-@app.route('/getAllGenerators', methods=['GET', 'POST'])
-def getAllGenerators():
-    infura_url = CONST["INFURA_URL"]
-    web3 = Web3(Web3.HTTPProvider(infura_url))
-    genftContractAddress = Web3.toChecksumAddress(CONST["GENFT_CONTRACT_ADDRESS"])
-    genftAbi = CONST["GENFT_ABI"]
-    genftContract = web3.eth.contract(address=genftContractAddress, abi=genftAbi)
-    generatorInfoOnChains = genftContract.functions.getAllGenerators().call()
-    result = []
-    for generatorInfoOnChain in generatorInfoOnChains:
-        generatorInfoProcessed = getGeneratorInfo(generatorInfoOnChain[0])
-        result.append(generatorInfoProcessed)
-    return make_response(jsonify(result), 200) 
-
-@app.route('/getRandomGenerator', methods=['GET', 'POST'])
-def getRandomGenerator():
-    allGenerators = getAllGenerators().json
-
-    randomGenerator = random.choice(allGenerators)
-    return jsonify(randomGenerator)
-
-@app.route('/getGeneratorInfo/<generatorAddress>', methods=['GET', 'POST'])
-def getGeneratorInfo(generatorAddress):
-    infura_url = CONST["INFURA_URL"]
-    web3 = Web3(Web3.HTTPProvider(infura_url))
-    generatorContractAddress = Web3.toChecksumAddress(generatorAddress)
-    genftContractAddress = Web3.toChecksumAddress(CONST["GENFT_CONTRACT_ADDRESS"])
-    generatorAbi = CONST["GENERATOR_ABI"]
-    generatorContract = web3.eth.contract(address=generatorContractAddress, abi=generatorAbi)
-    generatorInfoOnChain = generatorContract.functions.getGeneratorInfo().call()
-    canvasURI = generatorInfoOnChain[3] + "?seed=" + generatorInfoOnChain[4]
-    previewMetaData =  scrapeMetaData(canvasURI, generatorInfoOnChain)
-    return {
-        "contactAddress" : generatorInfoOnChain[0],
-        "name" : generatorInfoOnChain[1],
-        "description" : generatorInfoOnChain[2],
-        "canvasBaseURI" : generatorInfoOnChain[3],
-        "previewSeed" : generatorInfoOnChain[4],
-        "price" : generatorInfoOnChain[5],
-        "curSupply" : generatorInfoOnChain[6],
-        "maxSupply" : generatorInfoOnChain[7],
-        "royaltyRate" : generatorInfoOnChain[8],
-        "previewMetadata" : previewMetaData,
-    }
-
-@app.route('/getIterations/<generatorAddress>', methods=['GET', 'POST'])
-def getIterations(generatorAddress):
-    infura_url = CONST["INFURA_URL"]
-    web3 = Web3(Web3.HTTPProvider(infura_url))
-    generatorContractAddress = Web3.toChecksumAddress(generatorAddress)
-    genftContractAddress = Web3.toChecksumAddress(CONST["GENFT_CONTRACT_ADDRESS"])
-    generatorAbi = CONST["GENERATOR_ABI"]
-    generatorContract = web3.eth.contract(address=generatorContractAddress, abi=generatorAbi)
-    tokenInfoOnChains = generatorContract.functions.getIterations().call()
-    result = []
-    for tokenInfoOnChain in tokenInfoOnChains:
-        tokenInfoProcessed = getTokenInfo(generatorAddress, tokenInfoOnChain[0])
-        result.append(tokenInfoProcessed)
-    return jsonify(result)
-
-@app.route('/getTokenInfo/<generatorAddress>/<tokenID>', methods=['GET', 'POST'])
-def getTokenInfo(generatorAddress, tokenID):
-    infura_url = CONST["INFURA_URL"]
-    web3 = Web3(Web3.HTTPProvider(infura_url))
-    generatorContractAddress = Web3.toChecksumAddress(generatorAddress)
-    genftContractAddress = Web3.toChecksumAddress(CONST["GENFT_CONTRACT_ADDRESS"])
-    generatorAbi = CONST["GENERATOR_ABI"]
-    generatorContract = web3.eth.contract(address=generatorContractAddress, abi=generatorAbi)
-    tokenInfoOnChain = generatorContract.functions.getTokenInfo(int(tokenID)).call()
-    metaData = getTokenMetadataTest(generatorContractAddress, tokenID)
-    #return  metaData
-    result = {
-        "tokenID": tokenInfoOnChain[0],
-        "tokenURI": tokenInfoOnChain[1],
-        "owner": tokenInfoOnChain[2],
-        "metadata": metaData,
-    }
-    return result
-
-@app.route('/getTokenImage/<generatorAddress>/<seed>', methods=['GET', 'POST'])
-def getTokenImage(generatorAddress, seed):
-    infura_url = CONST["INFURA_URL"]
-    web3 = Web3(Web3.HTTPProvider(infura_url))
-    generatorContractAddress = Web3.toChecksumAddress(generatorAddress)
-    genftContractAddress = Web3.toChecksumAddress(CONST["GENFT_CONTRACT_ADDRESS"])
-    generatorAbi = CONST["GENERATOR_ABI"]
-    generatorContract = web3.eth.contract(address=generatorContractAddress, abi=generatorAbi)
-    generatorInfoOnChain = generatorContract.functions.getGeneratorInfo().call()
-     
-    canvasURI = generatorInfoOnChain[3] + "?seed=" + seed
-    
-    #url = "http://35.193.145.29:8080/ipfs/QmR1dDnSXz98vYXf4eL7kiR5qUEWCjJ3F96ts1Y7cfaqFH/?seed=Qmd286K6pohQcTKYqnS1YhWrCiS4gz7Xi34sdwMe9USZ7u"
-    return scrapeImage(canvasURI)
-
-@app.route('/getTokenMetadata/<generatorAddress>/<tokenID>', methods=['GET', 'POST'])
-def getTokenMetadata(generatorAddress, tokenID):
-    infura_url = CONST["INFURA_URL"]
-    web3 = Web3(Web3.HTTPProvider(infura_url))
-    generatorContractAddress = Web3.toChecksumAddress(generatorAddress)
-    genftContractAddress = Web3.toChecksumAddress(CONST["GENFT_CONTRACT_ADDRESS"])
-    generatorAbi = CONST["GENERATOR_ABI"]
-    genftAbi = CONST["GENFT_ABI"]
-    
-    genftContract = web3.eth.contract(address=genftContractAddress, abi=genftAbi)
-    generatorContract = web3.eth.contract(address=generatorContractAddress, abi=generatorAbi)
-    
-    generatorInfoOnChain = generatorContract.functions.getGeneratorInfo().call()
-    #return jsonify(generatorInfoOnChain)
-    tokenInfoOnChain = generatorContract.functions.getTokenInfo(int(tokenID)).call()
-    #return jsonify(tokenInfoOnChain)
-    tokenURI = tokenInfoOnChain[1]
-    seed = tokenURI.split("&seed=")[1] 
-    canvasBaseURI = generatorInfoOnChain[3]
-    scrapedMetaData = scrapeMetaData(canvasBaseURI + "?seed=" + seed, generatorInfoOnChain)
-    
-    return scrapedMetaData
-
-def getTokenMetadataTest(generatorAddress, tokenID):
-    infura_url = CONST["INFURA_URL"]
-    web3 = Web3(Web3.HTTPProvider(infura_url))
-    generatorContractAddress = Web3.toChecksumAddress(generatorAddress)
-    genftContractAddress = Web3.toChecksumAddress(CONST["GENFT_CONTRACT_ADDRESS"])
-    generatorAbi = CONST["GENERATOR_ABI"]
-    genftAbi = CONST["GENFT_ABI"]
-    
-    genftContract = web3.eth.contract(address=genftContractAddress, abi=genftAbi)
-    generatorContract = web3.eth.contract(address=generatorContractAddress, abi=generatorAbi)
-    
-    generatorInfoOnChain = generatorContract.functions.getGeneratorInfo().call()
-    #return jsonify(generatorInfoOnChain)
-    tokenInfoOnChain = generatorContract.functions.getTokenInfo(int(tokenID)).call()
-    #return jsonify(tokenInfoOnChain)
-    tokenURI = tokenInfoOnChain[1]
-    seed = tokenURI.split("&seed=")[1] 
-    canvasBaseURI = generatorInfoOnChain[3]
-    scrapedMetaData = scrapeMetaData(canvasBaseURI + "?seed=" + seed, generatorInfoOnChain)
-    
-    return scrapedMetaData
-
-
+    return jsonify(
+                screenshotData = screenshot
+            )
 
 
 
