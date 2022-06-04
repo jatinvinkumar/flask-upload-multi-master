@@ -34,7 +34,9 @@ def allowed_file(filename):
 
 #define and initiate the JSON const object 
 # Opening JSON file
-f = open('./constants.json')
+#f = open('./constants.json')
+
+f = open(os.path.join(UPLOAD_FOLDER, 'constants.json'))
   
 # returns JSON object as 
 # a dictionary
