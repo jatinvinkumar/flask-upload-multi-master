@@ -366,21 +366,15 @@ def scrapeImage(url):
 
     location = element.location
     size = element.size
+    print("")
     print("sup nerd")
     os.popen('echo "hi echo" ')
-    #generate random string
+    #driver.save_screenshot(os.path.join(UPLOAD_FOLDER, "screenshot_" + cid + ".png"))
+    driver.set_script_timeout(10)
+    screenshot = driver.execute_script('return canvas.toDataURL("png")')
     
-    driver.save_screenshot(os.path.join(UPLOAD_FOLDER, "screenshot_" + "123" + ".png"))
     time.sleep(2)
-    stream = os.popen("ipfs add " + os.path.join(UPLOAD_FOLDER, "screenshot_" + "123"+ ".png"))
-    #stream = os.popen("ipfs add screenshot_QmQ5nusUzBAeS3YGBnYroimd2jcQRYXvDZMj9c72D83Hxn.png")
-    #stream = os.popen('echo "bruh"')
-    output = stream.read()
-    print("hello there")
-    print(output)
-    arrayOutput = output.split(" ")[1]
-    toReturn = output
-    return send_file(os.path.join(UPLOAD_FOLDER, "screenshot_" + "123" + ".png"))
+    return screenshot
 
 def scrapeMetaData(canvasURI, generatorInfoOnChain):
     options = Options()
