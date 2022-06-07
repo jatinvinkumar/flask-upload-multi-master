@@ -15,17 +15,20 @@ import json
 from web3 import Web3
 import urllib.parse
 import random
+from flask_cors import CORS
 
 UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__file__))
 ALLOWED_EXTENSIONS = set(['zip'])
 
 app = Flask(__name__)
+CORS(app)
 
 # cors = CORS(app)
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy   dog'
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-cors = CORS(app, resources={r"/foo": {"origins": "http://localhost:port"}})
+
+
 
 def allowed_file(filename):
     return '.' in filename and \
