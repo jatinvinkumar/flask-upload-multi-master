@@ -506,15 +506,15 @@ def getTokenInfo(generatorAddress, tokenID):
 
 @app.route('/getTokenImage/<generatorAddress>/<seed>', methods=['GET', 'POST'])
 def getTokenImage(generatorAddress, seed):
-    # infura_url = CONST["INFURA_URL"]
-    # web3 = Web3(Web3.HTTPProvider(infura_url))
-    # generatorContractAddress = Web3.toChecksumAddress(generatorAddress)
-    # genftContractAddress = Web3.toChecksumAddress(CONST["GENFT_CONTRACT_ADDRESS"])
-    # generatorAbi = CONST["GENERATOR_ABI"]
-    # generatorContract = web3.eth.contract(address=generatorContractAddress, abi=generatorAbi)
-    # generatorInfoOnChain = generatorContract.functions.getGeneratorInfo().call()
+    infura_url = CONST["INFURA_URL"]
+    web3 = Web3(Web3.HTTPProvider(infura_url))
+    generatorContractAddress = Web3.toChecksumAddress(generatorAddress)
+    genftContractAddress = Web3.toChecksumAddress(CONST["GENFT_CONTRACT_ADDRESS"])
+    generatorAbi = CONST["GENERATOR_ABI"]
+    generatorContract = web3.eth.contract(address=generatorContractAddress, abi=generatorAbi)
+    generatorInfoOnChain = generatorContract.functions.getGeneratorInfo().call()
     
-    # canvasURI = generatorInfoOnChain[3] + "?seed=" + seed
+    canvasURI = generatorInfoOnChain[3] + "?seed=" + seed
     
     url = "http://35.239.82.129:8080/ipfs/QmR1dDnSXz98vYXf4eL7kiR5qUEWCjJ3F96ts1Y7cfaqFH/?seed=Qmd286K6pohQcTKYqnS1YhWrCiS4gz7Xi34sdwMe9USZ7u"
     return scrapeImage(url)
